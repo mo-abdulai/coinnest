@@ -4,7 +4,9 @@ import millify from 'millify'
 import { useParams } from 'react-router-dom'
 import { Col, Row, Typography, Select } from 'antd'
 import { MoneyCollectOutlined, DollarCircleOutlined, FundOutlined, ExclamationCircleOutlined, StopOutlined, TrophyOutlined, CheckOutlined, NumberOutlined, ThunderboltOutlined } from '@ant-design/icons';
-import { useGetCryptoDetailsQuery } from '../services/cryptoApi'
+import { useGetCryptoDetailsQuery, useGetCryptoHistoryQuery } from '../services/cryptoApi'
+import LineChart from './LineChart'
+import Loader from './Loader'
 const {Title, Text } = Typography;
 const { Option } = Select;
 
@@ -14,16 +16,19 @@ const CryptoDetails = () => {
 
 const [timePeriod, setTimePeriod] =  useState('7d')
 const {data, isFetching } = useGetCryptoDetailsQuery(coinId)
+const { data: coinHistory } = useGetCryptoHistoryQuery({coinId, timePeriod})
+
 const cryptoDetails = data?.data?.coin
-const volume = cryptoDetails['24hVolume'] 
-console.log(volume)
+// const volume = cryptoDetails['24hVolume'] 
+// console.log(volume)
 console.log(cryptoDetails)
 
+  if (isFetching) return <Loader />;
   const time = ['3h', '24h', '7d', '30d', '1y', '3m', '3y', '5y'];
   const stats = [
     { title: 'Price to USD', value: `$ ${cryptoDetails?.price && millify(cryptoDetails?.price)}`, icon: <DollarCircleOutlined /> },
     { title: 'Rank', value: cryptoDetails?.rank, icon: <NumberOutlined /> },
-    { title: '24h Volume', value: `$ ${volume && millify(volume)}`, icon: <ThunderboltOutlined /> },
+    { title: '24h Volume', value: `$ ${cryptoDetails['24hVolume'] && millify(cryptoDetails['24hVolume'])}`, icon: <ThunderboltOutlined /> },
     { title: 'Market Cap', value: `$ ${cryptoDetails?.marketCap && millify(cryptoDetails?.marketCap)}`, icon: <DollarCircleOutlined /> },
     { title: 'All-time-high(daily avg.)', value: `$ ${cryptoDetails?.allTimeHigh?.price && millify(cryptoDetails?.allTimeHigh?.price)}`, icon: <TrophyOutlined /> },
   ];
@@ -52,9 +57,9 @@ console.log(cryptoDetails)
       {time.map((date) => <Option key={date}>{date}</Option>)}
       </Select>
 
-      {/* line chart */}
+      <LineChart coinHistory={coinHistory} currentPrice={millify(cryptoDetails?.price)} coinName={cryptoDetails?.name}/>
 
-      <Col className='stats-container'>
+      <Col className='stats-container'> 
 
         <Col className='coin-value-statistics'>
         <Col className='coin-value-statistics-heading'>
