@@ -1,6 +1,6 @@
-# CryptoWorld
+# CryptoNest
 
-CryptoWorld is a React.js-based web application that provides comprehensive insights into the world of cryptocurrencies. With a sleek user interface powered by the Ant Design framework, CryptoWorld integrates data from various sources including the CoinRanking API, Rapid API, and Microsoft Bing Search API to offer users a holistic view of the crypto market.
+CryptoNest is a React.js-based web application that provides comprehensive insights into the world of cryptocurrencies. With a sleek user interface powered by the Ant Design framework, CryptoNest integrates data from various sources including the CoinRanking API, Rapid API, and Microsoft Bing Search API to offer users a holistic view of the crypto market.
 
 ## Features
 
@@ -11,7 +11,7 @@ Stay updated with the latest global crypto statistics including total market cap
 Explore the top cryptocurrencies ranked by market cap, providing valuable insights into the current trends and popular digital assets.
 
 ### Latest Crypto News
-Never miss out on important updates from the crypto world. CryptoWorld fetches the latest news articles related to cryptocurrencies using the Microsoft Bing Search API, keeping you informed and up-to-date.
+Never miss out on important updates from the crypto world. CryptoNest fetches the latest news articles related to cryptocurrencies using the Microsoft Bing Search API, keeping you informed and up-to-date.
 
 ### Exchanges
 Discover popular cryptocurrency exchanges and their trading volumes, helping you make informed decisions about where to trade.
@@ -35,7 +35,7 @@ Explore additional statistics and metrics to better understand the crypto market
 
 ## Installation
 
-To run CryptoWorld locally, follow these steps:
+To run CryptoNest locally, follow these steps:
 
 1. Clone this repository.
 2. Navigate to the project directory.
