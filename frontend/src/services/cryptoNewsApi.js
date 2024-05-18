@@ -7,7 +7,6 @@ const cryptoNewsHeaders = {
 
 const createRequest = (url) => ({ url, headers: cryptoNewsHeaders });
 const baseUrl = "https://api.bing.microsoft.com/v7.0"
-
 export const cryptoNewsApi = createApi({
   reducerPath: "cryptoNewsApi",
   baseQuery: fetchBaseQuery({ baseUrl }),

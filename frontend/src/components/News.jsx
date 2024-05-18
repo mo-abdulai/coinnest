@@ -16,7 +16,6 @@ const News = ({ simplified }) => {
   });
 
   const { data } = useGetCryptosQuery(100);
-
   const demoImage = "https://www.bing.com/th?id=OVFT.mpzuVZnv8dwIMRfQGPbOPC&pid=News";
  
   if (!cryptoNews?.value) return <Loader />;
