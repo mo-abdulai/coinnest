@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { Card, Row, Col, Input } from "antd";
 import Loader from "./Loader";
 import { useGetCryptosQuery } from "../services/cryptoApi";
+// import { email } from '../services/email.js'
+
 const Cryptocurrencies = ({ simplified }) => {
   const count = simplified ? 10 : 100;
   const { data: cryptosList, isFetching } = useGetCryptosQuery(count);
@@ -19,6 +21,9 @@ const Cryptocurrencies = ({ simplified }) => {
   }, [cryptosList, searchTerm]);
 
     if (isFetching) return <Loader />;
+    if(cryptos.price > 60000){
+
+    }
   return (
     <>
       {!simplified && (
@@ -35,7 +40,7 @@ const Cryptocurrencies = ({ simplified }) => {
           <Col xs={24} sm={12} lg={6} className="crypto-card" key={currency?.uuid}>
             <Link to={`/crypto/${currency?.uuid}`}>
               <Card
-                title={`${currency.rank}.${currency.name}`}
+                title={`${currency.rank}. ${currency.name}`}
                 extra={<img className="crypto-image" alt="cryptocurrency" src={currency.iconUrl} />}
                 hoverable
               >
