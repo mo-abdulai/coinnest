@@ -2,62 +2,95 @@ from flask import Flask, jsonify
 import pandas as pd
 import requests
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
+import datetime
+# from sklearn.linear_model import LinearRegression
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import mean_squared_error
+from dotenv import load_dotenv
+from flask_mail import Mail, Message
+from flask import Flask, render_template_string
+load_dotenv()
+import os
 
 app = Flask(__name__)
 
+from flask import Flask
+from flask_mail import Mail, Message
+
+app = Flask(__name__)
+
+# Configuration for Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv("USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("PASSWORD")
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv("SENDER")
+
+mail = Mail(app)
+
+
 API_URL = 'https://api.coinranking.com/v2'
 
-
+# Set request headers for coinranking api
 headers = {
-  'x-access-token': 'coinranking35e688d8f9383eba7a8a0564344441cb20f2993b6203acba'
+  'x-access-token': os.getenv("COIN_KEY")
 }
 
-@app.route('/') # ‘https://www.google.com/‘
+def send_email(subject, recipients, body):
+    try:
+        msg = Message(
+            subject=subject,
+            recipients=[recipients],  # Replace with recipient's email address
+            body=body
+            # subject=subject,
+            # recipients=[recipients],
+            # body=body
+        )
+        mail.send(msg)
+        return "Email sent successfully!"
+    except Exception as e:
+        return str(e)
 
+
+@app.route('/') # ‘https://www.google.com/‘
+    
 def get_cryptocurrencies():
     try:
         # Make GET request to CoinRanking API with API key
-        response = requests.get(API_URL + '/coin/razxDUgYGNAdQ/history?timePeriod=3h', headers)
+        response = requests.get(API_URL + '/coin/Qwsogvtv82FCd/history?timePeriod=1h', headers)
 
         # Check if request was successful
         if response.status_code == 200:
-            # Extract cryptocurrency data from response
-            data = response.json()['data']['history']
-    
-            # Return cryptocurrency data as JSON response
-            # return jsonify(data)
+            price_date_list = []
+            datas = response.json()['data']['history']
+            highest_price = 0
+            highest_price_data = {}
+            # if data[0].price > 60000:
+            for data in datas:
+                price = float(data['price'])
+                if price > highest_price:
+                    highest_price = price
+                    timestamp = data['timestamp']
+                    date_time = datetime.datetime.fromtimestamp(timestamp)
+                    formatted_date = date_time.strftime('%Y-%m-%d %H:%M:%S')
+                    highest_price_data = {'price': highest_price, 'date': formatted_date}
+
+                    # print(f"${price} {formatted_date}")
+            threshold_price = 63000
+            if highest_price > threshold_price:
+                subject = "Cryptocurrency Highest Price Alert"
+                recipient = os.getenv("RECEPIENT")  # Replace with recipient's email address
+                body = f"The highest price of the cryptocurrency in the past 24 hours has exceeded {threshold_price}. Current highest price: {highest_price} at {highest_price_data['date']}"
+                email_status = send_email(subject, recipient, body)
+                print(email_status)       
+                 
+
+            return jsonify(data)
             #use line plot to draw data
 
-
-# Preprocess data and select features
-# For simplicity, let's consider only closing prices as the feature
-            X = data['price']
-            y = data['timestamp']
-
-            # Split data into training and testing sets
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-            # Train the linear regression model
-            model = LinearRegression()
-            model.fit(X_train.values.reshape(-1, 1), y_train)
-
-            # Make predictions on the testing set
-            predictions = model.predict(X_test.values.reshape(-1, 1))
-
-            # Evaluate the model
-            mse = mean_squared_error(y_test, predictions)
-            print('Mean Squared Error:', mse)
-       
-            # return jsonify({'message': 'Cryptocurrency data fetched successfully'})
-        
-        else:
-            # Return error message if request failed
-            return jsonify({'error': 'Failed to fetch data from CoinRanking API'}), 500
     except Exception as e:
         # Handle any exceptions
         return jsonify({'error': str(e)}), 500
 
-app.run(port=5000)
+app.run(debug=True)
