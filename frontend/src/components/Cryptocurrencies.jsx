@@ -13,17 +13,31 @@ const Cryptocurrencies = ({ simplified }) => {
   const [cryptos, setCryptos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const useDebounce = (text, delay = 1000) => {
+    const [deBounce, setDebounce] = useState(text);
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setDebounce(text);
+      }, delay);
+
+      return () => clearTimeout(timer)
+    }, [text, delay]);
+
+    return deBounce;
+  };
+
+  const deBounceFilter = useDebounce(searchTerm)
+
   useEffect(() => {
     const filteredData = cryptosList?.data?.coins.filter((coin) =>
-      coin.name.toLowerCase().includes(searchTerm.toLowerCase())
+      coin.name.toLowerCase().includes(deBounceFilter.toLowerCase())
     );
     setCryptos(filteredData);
-  }, [cryptosList, searchTerm]);
+  }, [cryptosList, deBounceFilter]);
 
-    if (isFetching) return <Loader />;
-    if(cryptos.price > 60000){
-
-    }
+  if (isFetching) return <Loader />;
+  if (cryptos?.price > 60000) {
+  }
   return (
     <>
       {!simplified && (
@@ -36,12 +50,23 @@ const Cryptocurrencies = ({ simplified }) => {
       )}
       <Row gutter={[32, 32]} className="crypto-card-container">
         {cryptos?.map((currency) => (
-          
-          <Col xs={24} sm={12} lg={6} className="crypto-card" key={currency?.uuid}>
+          <Col
+            xs={24}
+            sm={12}
+            lg={6}
+            className="crypto-card"
+            key={currency?.uuid}
+          >
             <Link to={`/crypto/${currency?.uuid}`}>
               <Card
                 title={`${currency.rank}. ${currency.name}`}
-                extra={<img className="crypto-image" alt="cryptocurrency" src={currency.iconUrl} />}
+                extra={
+                  <img
+                    className="crypto-image"
+                    alt="cryptocurrency"
+                    src={currency.iconUrl}
+                  />
+                }
                 hoverable
               >
                 <p>Price: {millify(currency.price)}</p>
